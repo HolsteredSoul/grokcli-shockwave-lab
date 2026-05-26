@@ -6,6 +6,7 @@
   <title>GrokCLI • Starship Shock Diamonds • Interactive Physics Lab</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💎</text></svg>">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&amp;family=Space+Mono:wght@400;700&amp;display=swap');
     
@@ -243,19 +244,27 @@
           <div class="lab-card rounded-2xl p-8">
             <div class="uppercase text-[10px] tracking-[2px] text-orange-500 font-semibold">THE KEY RELATIONSHIP</div>
             
-            <div class="physics-formula mt-5 rounded text-xl font-medium text-orange-300">
-              x ≈ 0.67 × D₀ × √(P₀ / Pₐ)
+            <div class="physics-formula mt-5 rounded text-lg font-medium text-orange-300">
+              L ≈ 1.3 × D₀ × √(M<sub>e</sub>² − 1)
             </div>
-            
+            <div class="mt-2 text-[11px] text-zinc-500 font-mono">
+              Pack/Prandtl shock-cell length — used by the simulator.
+            </div>
+
             <div class="mt-4 text-xs grid grid-cols-2 gap-y-3 text-zinc-400 font-mono">
-              <div>x</div><div class="text-right text-zinc-500">distance to first diamond</div>
+              <div>L</div><div class="text-right text-zinc-500">shock-cell length</div>
               <div>D₀</div><div class="text-right text-zinc-500">nozzle exit diameter</div>
-              <div>P₀</div><div class="text-right text-zinc-500">chamber pressure</div>
-              <div>Pₐ</div><div class="text-right text-zinc-500">ambient pressure</div>
+              <div>M<sub>e</sub></div><div class="text-right text-zinc-500">exit Mach (isentropic from P₀/Pₐ)</div>
             </div>
-            
-            <div class="mt-6 pt-6 border-t border-white/10 text-[13px] text-zinc-400">
-              Higher chamber pressure or lower ambient pressure (higher altitude) moves the diamonds farther apart and can reduce their number or eliminate them entirely.
+
+            <div class="mt-5 pt-4 border-t border-white/10 text-[12px] text-zinc-400">
+              <span class="text-zinc-300">Legacy form often seen in textbooks:</span><br>
+              <span class="font-mono text-orange-300/80">x ≈ 0.67 × D₀ × √(P₀ / Pₐ)</span><br>
+              <span class="text-zinc-500">— a pressure-ratio approximation that hides the exit-Mach dependence.</span>
+            </div>
+
+            <div class="mt-5 pt-4 border-t border-white/10 text-[13px] text-zinc-400">
+              Higher chamber pressure or lower ambient pressure (higher altitude) raises M<sub>e</sub>, moves the diamonds farther apart, and can reduce or eliminate them entirely.
             </div>
           </div>
         </div>
@@ -270,8 +279,8 @@
         <div class="uppercase text-orange-500 text-xs tracking-[3px] font-semibold">INTERACTIVE SHOCKWAVE LAB</div>
         <h3 class="display-font text-5xl tracking-[-1.5px]">Adjust the parameters.<br>See the diamonds change.</h3>
       </div>
-      <div class="hidden lg:block text-xs font-mono text-right text-zinc-500 max-w-[220px]">
-        Real-time approximation of the 1D shock cell model using the 0.67D√(P₀/Pₐ) relation + normal shock temperature jump.
+      <div class="hidden lg:block text-xs font-mono text-right text-zinc-500 max-w-[240px]">
+        Pack/Prandtl shock-cell model with isentropic Mach closure and Rankine-Hugoniot temperature jump. Atmosphere: US-Standard piecewise.
       </div>
     </div>
 
@@ -285,9 +294,16 @@
               <span>PLUME SIMULATION — 2D CROSS SECTION</span>
             </div>
             <div class="text-cyan-400">60 FPS</div>
+            <button id="pause-btn"
+                    class="ml-3 px-2 py-0.5 text-[10px] border border-white/15 hover:bg-white/5 rounded font-mono">PAUSE</button>
+          </div>
+          <div class="px-3 pb-2 text-[10px] text-zinc-500 font-mono">
+            Keyboard: <span class="text-orange-400">R</span> reset • <span class="text-orange-400">C</span> capture frame • click canvas for temporary boost
           </div>
           
-          <canvas id="plume-sim" width="900" height="520" class="w-full"></canvas>
+          <canvas id="plume-sim" width="900" height="520" class="w-full"
+                  role="img"
+                  aria-label="Animated 2D cross-section of a rocket exhaust plume showing shock diamonds. Live metrics below report first-diamond distance, count, post-shock temperature jump, and pressure ratio."></canvas>
           
           <div class="flex justify-between items-center mt-3 px-1 text-[10px] font-mono text-zinc-500">
             <div>NOZZLE → FLOW DIRECTION →</div>
@@ -298,6 +314,7 @@
 
       <!-- Controls -->
       <div class="xl:col-span-5">
+        <h2 class="sr-only">Interactive simulator controls</h2>
         <div class="lab-card rounded-3xl p-8 space-y-8">
           <!-- Presets -->
           <div>
@@ -316,18 +333,22 @@
                 <div>Chamber Pressure <span class="font-mono text-orange-400">(P₀)</span></div>
                 <div class="font-mono text-orange-300" id="p0-val">2.8</div>
               </div>
-              <input type="range" id="p0" min="1.2" max="5" step="0.05" value="2.8" 
+              <input type="range" id="p0" min="1.2" max="5" step="0.05" value="2.8"
+                     aria-label="Chamber pressure, relative units"
+                     aria-valuetext="2.80 relative units"
                      class="w-full accent-orange-500">
             </div>
 
             <div>
               <div class="flex justify-between text-sm mb-2">
-                <div>Ambient Pressure <span class="font-mono text-cyan-400">(Pₐ)</span></div>
-                <div class="font-mono text-cyan-300" id="pa-val">1.0</div>
+                <div>Altitude <span class="font-mono text-cyan-400">(km)</span></div>
+                <div class="font-mono text-cyan-300" id="altitude-val">0</div>
               </div>
-              <input type="range" id="pa" min="0.1" max="1.8" step="0.02" value="1.0" 
+              <input type="range" id="altitude" min="0" max="20" step="0.5" value="0"
+                     aria-label="Altitude, kilometers"
+                     aria-valuetext="0.0 kilometers"
                      class="w-full accent-cyan-400">
-              <div class="text-[10px] text-right text-zinc-500 mt-0.5">≈ sea level (lower = higher altitude)</div>
+              <div class="text-[10px] text-right text-zinc-500 mt-0.5">US-Standard atmosphere (piecewise: troposphere + stratosphere)</div>
             </div>
 
             <div>
@@ -335,17 +356,19 @@
                 <div>Effective Nozzle Diameter (m)</div>
                 <div class="font-mono" id="d0-val">0.85</div>
               </div>
-              <input type="range" id="d0" min="0.2" max="3.5" step="0.05" value="0.85" 
+              <input type="range" id="d0" min="0.2" max="3.5" step="0.05" value="0.85"
+                     aria-label="Effective nozzle diameter, meters"
+                     aria-valuetext="0.85 meters"
                      class="w-full accent-white">
             </div>
           </div>
 
           <div class="flex gap-3 pt-2">
-            <button onclick="resetDefaults()" 
+            <button id="reset-btn"
                     class="flex-1 py-2.5 text-sm border border-white/15 hover:bg-white/5 rounded-xl font-medium transition-colors">
-              RESET TO STARSHIP IFT-2
+              RESET
             </button>
-            <button onclick="captureFrame()" 
+            <button id="capture-btn"
                     class="flex-1 py-2.5 text-sm bg-white/10 hover:bg-white/15 rounded-xl font-medium transition-colors">
               CAPTURE FRAME
             </button>
@@ -355,11 +378,13 @@
     </div>
 
     <!-- Live metrics -->
-    <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+    <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm"
+         role="status" aria-live="polite" aria-atomic="false"
+         aria-label="Live physics metrics">
       <div class="lab-card rounded-2xl px-6 py-4">
         <div class="text-xs text-zinc-500">FIRST DIAMOND DISTANCE</div>
         <div class="text-3xl font-semibold tabular-nums mt-1" id="first-diamond">—</div>
-        <div class="text-orange-400 text-xs font-mono">METERS (THEORETICAL)</div>
+        <div class="text-orange-400 text-xs font-mono">METERS (PACK/PRANDTL)</div>
       </div>
       <div class="lab-card rounded-2xl px-6 py-4">
         <div class="text-xs text-zinc-500">VISIBLE DIAMONDS</div>
@@ -369,12 +394,12 @@
       <div class="lab-card rounded-2xl px-6 py-4">
         <div class="text-xs text-zinc-500">POST-SHOCK ΔT</div>
         <div class="text-3xl font-semibold tabular-nums mt-1" id="temp-jump">—</div>
-        <div class="text-amber-400 text-xs font-mono">K (NORMAL SHOCK)</div>
+        <div class="text-amber-400 text-xs font-mono">K (RANKINE-HUGONIOT)</div>
       </div>
       <div class="lab-card rounded-2xl px-6 py-4">
         <div class="text-xs text-zinc-500">PRESSURE RATIO</div>
         <div class="text-3xl font-semibold tabular-nums mt-1" id="pressure-ratio">—</div>
-        <div class="text-zinc-400 text-xs font-mono">P₀ / Pₐ</div>
+        <div class="text-zinc-400 text-xs font-mono">P₀ / Pₐ • M<sub>e</sub> = <span id="exit-mach">—</span></div>
       </div>
     </div>
   </section>
@@ -421,7 +446,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <!-- Image 1 -->
       <div class="lab-card rounded-2xl overflow-hidden">
-        <img src="assets/cluster-mega-diamond.jpg" alt="Comparison of single Raptor shock diamonds vs the massive 33-engine Starship cluster mega diamonds" class="w-full h-auto">
+        <img src="assets/cluster-mega-diamond.jpg" alt="Comparison of single Raptor shock diamonds vs the massive 33-engine Starship cluster mega diamonds" class="w-full h-auto" loading="lazy">
         <div class="p-5 text-sm">
           <div class="font-medium text-orange-400">33-Engine Mega Diamonds</div>
           <div class="text-zinc-400 mt-1 text-[13px]">The clustered exhaust creates an effective “mega-nozzle” producing the largest, most clearly defined shock structures ever seen on a launch vehicle.</div>
@@ -430,7 +455,7 @@
 
       <!-- Image 2 -->
       <div class="lab-card rounded-2xl overflow-hidden">
-        <img src="assets/shock-cell-schematic.jpg" alt="Physics schematic showing oblique shocks, expansion fans, and Mach disks forming the repeating diamond pattern" class="w-full h-auto">
+        <img src="assets/shock-cell-schematic.jpg" alt="Physics schematic showing oblique shocks, expansion fans, and Mach disks forming the repeating diamond pattern" class="w-full h-auto" loading="lazy">
         <div class="p-5 text-sm">
           <div class="font-medium text-orange-400">Wave Pattern Schematic</div>
           <div class="text-zinc-400 mt-1 text-[13px]">Oblique shocks compress the flow while expansion fans re-accelerate it. The normal shock (Mach disk) creates the bright visible glow through afterburning.</div>
@@ -439,7 +464,7 @@
 
       <!-- Image 3 -->
       <div class="lab-card rounded-2xl overflow-hidden">
-        <img src="assets/altitude-variation.jpg" alt="Comparison of shock diamond behavior at sea level versus high altitude" class="w-full h-auto">
+        <img src="assets/altitude-variation.jpg" alt="Comparison of shock diamond behavior at sea level versus high altitude" class="w-full h-auto" loading="lazy">
         <div class="p-5 text-sm">
           <div class="font-medium text-orange-400">Altitude Effect</div>
           <div class="text-zinc-400 mt-1 text-[13px]">At sea level the plume is strongly overexpanded (many bright diamonds). At altitude the ambient pressure drops and the pattern changes dramatically or disappears.</div>

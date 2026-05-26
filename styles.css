@@ -69,6 +69,36 @@ input[type=range]::-moz-range-thumb {
   border: none;
 }
 
+/* Consistent focus-visible rings for keyboard navigation */
+button:focus-visible,
+a:focus-visible,
+input[type=range]:focus-visible {
+  outline: 2px solid #ff5e00;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+input[type=range]:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgba(255, 94, 0, 0.45);
+}
+
+input[type=range]:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px rgba(255, 94, 0, 0.45);
+}
+
+/* Screen-reader-only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Subtle scanline overlay on simulator area */
 .sim-container {
   position: relative;

@@ -6,11 +6,14 @@ An educational, self-contained web experience that explains the dramatic Mach di
 
 ## Features
 
-- **Real-time 2D simulator** — Adjust chamber pressure, ambient pressure, and nozzle scale. Watch the shock cell pattern respond instantly using the well-known `x ≈ 0.67 × D₀ × √(P₀/Pₐ)` relation plus simplified normal-shock temperature jump.
+- **Real-time 2D simulator** — Adjust chamber pressure, altitude (km), and nozzle scale. Watch the shock cell pattern respond instantly using the well-known `x ≈ 0.67 × D₀ × √(P₀/Pₐ)` relation + simplified normal-shock temperature jump.
+- **Intuitive Altitude slider** — Replaces raw ambient pressure with a realistic standard atmosphere model (0–20 km).
 - **Live physics readouts** — First diamond distance, visible diamond count, approximate post-shock ΔT, pressure ratio.
-- **Presets** — Starship IFT-2, High Altitude, Falcon 9, Max Overexpanded.
-- **Capture** — Export the current simulator frame as a PNG.
-- **Custom visuals** — Every diagram and hero image was generated specifically for this project using Grok Imagine.
+- **Presets** — Starship IFT-2, High Altitude (~12 km), Falcon 9, Max Overexpanded. Active preset is visually highlighted.
+- **Pause / Capture** — Pause the animation (great for screenshots) + export current frame as PNG.
+- **Persistent state** — Your last settings are remembered across reloads via localStorage.
+- **Educational tooltip** — Hover near the first diamond on the canvas for a quick "what am I seeing?" explanation.
+- **Custom visuals** — All diagrams and hero images were purpose-generated with Grok Imagine for this project.
 
 ## Running Locally
 
