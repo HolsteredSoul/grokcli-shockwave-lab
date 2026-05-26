@@ -1,1 +1,460 @@
-<FULL INDEX HTML CONTENT HERE - would paste the complete file>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GrokCLI • Starship Shock Diamonds • Interactive Physics Lab</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&amp;family=Space+Mono:wght@400;700&amp;display=swap');
+    
+    :root {
+      --plasma-orange: #ff5e00;
+      --afterburner-cyan: #00e5ff;
+      --glow-yellow: #ffeb3b;
+      --void: #0a0c14;
+      --steel: #11151f;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    
+    .display-font {
+      font-family: 'Rajdhani', system-ui, sans-serif;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .mono {
+      font-family: 'Space Mono', ui-monospace, monospace;
+    }
+
+    .lab-bg {
+      background-color: var(--void);
+      background-image: 
+        linear-gradient(rgba(255,94,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    .section-header {
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+    }
+
+    .plasma-text {
+      color: var(--plasma-orange);
+    }
+
+    .cyan-text {
+      color: var(--afterburner-cyan);
+    }
+
+    .shock-diamond {
+      box-shadow: 
+        0 0 12px rgb(255 94 0 / 0.6),
+        0 0 28px rgb(255 94 0 / 0.3);
+    }
+
+    .lab-card {
+      background: linear-gradient(145deg, #11151f, #0a0c14);
+      border: 1px solid rgba(255,94,0,0.15);
+      transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s;
+    }
+
+    .lab-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    .metric {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .diamond-divider {
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 6px,
+        rgba(255,94,0,0.35) 6px,
+        rgba(255,94,0,0.35) 9px
+      );
+      height: 1px;
+    }
+
+    .physics-formula {
+      font-family: 'Space Mono', monospace;
+      background: rgba(0,0,0,0.4);
+      padding: 0.75rem 1rem;
+      border-left: 3px solid var(--plasma-orange);
+    }
+
+    canvas#plume-sim {
+      background: #05070d;
+      border: 1px solid rgba(255,94,0,0.2);
+      border-radius: 8px;
+    }
+
+    .status-dot {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .nav-active {
+      color: white;
+      border-bottom: 2px solid var(--plasma-orange);
+    }
+  </style>
+</head>
+<body class="bg-[#0a0c14] text-zinc-200 selection:bg-orange-500/30">
+  <!-- Top nav -->
+  <nav class="border-b border-white/10 bg-[#0a0c14]/95 backdrop-blur-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-8 flex items-center justify-between h-16">
+      <div class="flex items-center gap-x-3">
+        <div class="flex items-center gap-x-2">
+          <div class="w-8 h-8 rounded bg-gradient-to-br from-orange-500 to-cyan-400 flex items-center justify-center">
+            <span class="text-black font-bold text-xl tracking-tighter">G</span>
+          </div>
+          <div>
+            <span class="display-font text-2xl font-semibold tracking-tight">grokcli</span>
+            <span class="text-xs text-zinc-500 font-mono ml-1.5 align-super">/shockwave</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-x-8 text-sm">
+        <a href="#phenomenon" class="hover:text-white transition-colors">The Phenomenon</a>
+        <a href="#physics" class="hover:text-white transition-colors">Physics</a>
+        <a href="#lab" class="hover:text-white transition-colors font-medium">Interactive Lab</a>
+        <a href="#gallery" class="hover:text-white transition-colors">Gallery</a>
+        <a href="https://github.com/HolsteredSoul/grokcli-shockwave-lab" target="_blank" 
+           class="px-4 py-1.5 rounded-full border border-white/20 hover:bg-white/5 text-xs font-medium transition-all flex items-center gap-x-1.5">
+          <span>VIEW ON GITHUB</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="relative overflow-hidden border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-8 pt-16 pb-20">
+      <div class="max-w-3xl">
+        <div class="inline-flex items-center gap-x-2 rounded-full bg-white/5 px-3 py-1 text-xs tracking-[3px] font-mono mb-6 border border-white/10">
+          <div class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></div>
+          IFT-2 / STARSHIP FLIGHT TEST
+        </div>
+        
+        <h1 class="display-font text-7xl leading-[0.92] tracking-[-3.2px] font-semibold">
+          THE MOTHER OF ALL<br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-cyan-400">SHOCK DIAMONDS</span>
+        </h1>
+        
+        <p class="mt-6 max-w-md text-xl text-zinc-400">
+          An interactive exploration of the supersonic physics behind the dramatic Mach diamonds seen during SpaceX Starship launches.
+        </p>
+        
+        <div class="mt-8 flex items-center gap-x-4">
+          <a href="#lab" 
+             class="inline-flex items-center justify-center rounded-full bg-white text-black px-8 py-3.5 text-sm font-semibold tracking-wide hover:bg-white/90 transition-all active:scale-[0.985]">
+            LAUNCH THE SIMULATOR
+          </a>
+          <a href="#physics" 
+             class="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3.5 text-sm hover:bg-white/5 transition-all">
+            LEARN THE PHYSICS
+          </a>
+        </div>
+        
+        <div class="mt-8 text-xs text-zinc-500 font-mono flex items-center gap-x-3">
+          <div>BUILT WITH GROK 4.3 + IMAGINE</div>
+          <div class="w-px h-3 bg-white/20"></div>
+          <div>POWERED BY GROK CLI + GITHUB MCP</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero visual -->
+    <div class="relative mx-auto max-w-[1200px] px-8 -mb-4">
+      <div class="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+        <img src="assets/hero-shock-diamonds.jpg" 
+             alt="SpaceX Starship Super Heavy booster during launch with prominent shock diamonds visible in the 33-engine exhaust plume"
+             class="w-full object-cover aspect-[16/9] brightness-[0.92]">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-8 left-8 right-8 flex items-end justify-between text-xs font-mono tracking-widest">
+          <div class="text-orange-400">33 RAPTOR ENGINES • SEA LEVEL • OVEREXPANDED</div>
+          <div class="text-white/60">SHOCK DIAMONDS • MACH DISKS • AFTERBURN GLOW</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Phenomenon -->
+  <section id="phenomenon" class="max-w-5xl mx-auto px-8 pt-20 pb-16">
+    <div class="grid grid-cols-12 gap-x-8 items-start">
+      <div class="col-span-12 lg:col-span-5">
+        <div class="uppercase text-orange-500 text-xs tracking-[3px] font-semibold mb-3">THE PHENOMENON</div>
+        <h2 class="display-font text-5xl tracking-[-1.6px] leading-none">What you’re seeing<br>during liftoff.</h2>
+      </div>
+      <div class="col-span-12 lg:col-span-7 mt-6 lg:mt-2 text-lg text-zinc-400 space-y-5">
+        <p>During several Starship Integrated Flight Tests, cameras captured dramatic, glowing diamond-shaped structures in the exhaust plume of the Super Heavy booster. These are not artifacts — they are real, physical <span class="text-white">shock diamonds</span> (also called Mach diamonds or thrust diamonds).</p>
+        
+        <p>The 33 Raptor engines, operating at sea level, produce a massively overexpanded supersonic jet. Ambient atmospheric pressure is higher than the exhaust pressure at the nozzle exit, causing the plume to be repeatedly compressed by oblique shock waves and expanded by Prandtl-Meyer fans.</p>
+        
+        <div class="pt-2">
+          <div class="text-sm text-orange-400 font-medium">The visible glow comes from:</div>
+          <ul class="mt-2 space-y-1 text-base text-zinc-400">
+            <li class="flex gap-x-2"><span class="text-orange-500/70">→</span> Temperature and pressure spikes across normal shocks (Mach disks) igniting unburned fuel</li>
+            <li class="flex gap-x-2"><span class="text-orange-500/70">→</span> Density changes that make the flow structure visible to the naked eye and cameras</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Physics Deep Dive -->
+  <section id="physics" class="border-y border-white/10 bg-[#05070d] py-16">
+    <div class="max-w-5xl mx-auto px-8">
+      <div class="max-w-2xl">
+        <div class="uppercase text-cyan-400 text-xs tracking-[3px] font-semibold mb-3">THE PHYSICS</div>
+        <h3 class="display-font text-4xl tracking-tight">How shock diamonds actually form</h3>
+      </div>
+
+      <div class="mt-10 grid grid-cols-1 lg:grid-cols-5 gap-x-8 gap-y-12">
+        <!-- Left column: explanation -->
+        <div class="lg:col-span-3 space-y-8 text-[15px] text-zinc-300">
+          <div>
+            <div class="font-medium text-white mb-2">Overexpanded nozzle (sea level)</div>
+            <p class="text-zinc-400">At liftoff, the Raptor sea-level nozzles are designed for higher altitudes. At sea level the ambient pressure is too high, so the exhaust is <span class="text-orange-300">overexpanded</span>. The jet contracts after leaving the nozzle.</p>
+          </div>
+          
+          <div>
+            <div class="font-medium text-white mb-2">The repeating wave pattern</div>
+            <ol class="list-decimal pl-5 space-y-1 text-zinc-400">
+              <li>Oblique shocks form and compress the flow</li>
+              <li>Expansion fans reflect and accelerate it</li>
+              <li>A normal shock (Mach disk) forms perpendicular to the flow</li>
+              <li>The cycle repeats, slowly dissipating due to turbulence</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Formula card -->
+        <div class="lg:col-span-2">
+          <div class="lab-card rounded-2xl p-8">
+            <div class="uppercase text-[10px] tracking-[2px] text-orange-500 font-semibold">THE KEY RELATIONSHIP</div>
+            
+            <div class="physics-formula mt-5 rounded text-xl font-medium text-orange-300">
+              x ≈ 0.67 × D₀ × √(P₀ / Pₐ)
+            </div>
+            
+            <div class="mt-4 text-xs grid grid-cols-2 gap-y-3 text-zinc-400 font-mono">
+              <div>x</div><div class="text-right text-zinc-500">distance to first diamond</div>
+              <div>D₀</div><div class="text-right text-zinc-500">nozzle exit diameter</div>
+              <div>P₀</div><div class="text-right text-zinc-500">chamber pressure</div>
+              <div>Pₐ</div><div class="text-right text-zinc-500">ambient pressure</div>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-white/10 text-[13px] text-zinc-400">
+              Higher chamber pressure or lower ambient pressure (higher altitude) moves the diamonds farther apart and can reduce their number or eliminate them entirely.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Interactive Lab -->
+  <section id="lab" class="max-w-6xl mx-auto px-8 pt-16 pb-12">
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <div class="uppercase text-orange-500 text-xs tracking-[3px] font-semibold">INTERACTIVE SHOCKWAVE LAB</div>
+        <h3 class="display-font text-5xl tracking-[-1.5px]">Adjust the parameters.<br>See the diamonds change.</h3>
+      </div>
+      <div class="hidden lg:block text-xs font-mono text-right text-zinc-500 max-w-[220px]">
+        Real-time approximation of the 1D shock cell model using the 0.67D√(P₀/Pₐ) relation + normal shock temperature jump.
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+      <!-- Simulator viewport -->
+      <div class="xl:col-span-7">
+        <div class="lab-card rounded-3xl p-5">
+          <div class="flex items-center justify-between px-3 mb-3 text-xs uppercase tracking-widest font-mono">
+            <div class="flex items-center gap-x-2">
+              <div class="w-2 h-2 rounded-full bg-orange-500 status-dot"></div>
+              <span>PLUME SIMULATION — 2D CROSS SECTION</span>
+            </div>
+            <div class="text-cyan-400">60 FPS</div>
+          </div>
+          
+          <canvas id="plume-sim" width="900" height="520" class="w-full"></canvas>
+          
+          <div class="flex justify-between items-center mt-3 px-1 text-[10px] font-mono text-zinc-500">
+            <div>NOZZLE → FLOW DIRECTION →</div>
+            <div id="sim-status">OVEREXPANDED • VISIBLE DIAMONDS: <span class="text-orange-400 font-medium" id="diamond-count">7</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="xl:col-span-5">
+        <div class="lab-card rounded-3xl p-8 space-y-8">
+          <!-- Presets -->
+          <div>
+            <div class="text-xs uppercase tracking-widest text-zinc-500 mb-3">PRESETS</div>
+            <div class="flex flex-wrap gap-2" id="presets">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div class="diamond-divider"></div>
+
+          <!-- Sliders -->
+          <div class="space-y-6">
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <div>Chamber Pressure <span class="font-mono text-orange-400">(P₀)</span></div>
+                <div class="font-mono text-orange-300" id="p0-val">2.8</div>
+              </div>
+              <input type="range" id="p0" min="1.2" max="5" step="0.05" value="2.8" 
+                     class="w-full accent-orange-500">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <div>Ambient Pressure <span class="font-mono text-cyan-400">(Pₐ)</span></div>
+                <div class="font-mono text-cyan-300" id="pa-val">1.0</div>
+              </div>
+              <input type="range" id="pa" min="0.1" max="1.8" step="0.02" value="1.0" 
+                     class="w-full accent-cyan-400">
+              <div class="text-[10px] text-right text-zinc-500 mt-0.5">≈ sea level (lower = higher altitude)</div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <div>Effective Nozzle Diameter (m)</div>
+                <div class="font-mono" id="d0-val">0.85</div>
+              </div>
+              <input type="range" id="d0" min="0.2" max="3.5" step="0.05" value="0.85" 
+                     class="w-full accent-white">
+            </div>
+          </div>
+
+          <div class="flex gap-3 pt-2">
+            <button onclick="resetDefaults()" 
+                    class="flex-1 py-2.5 text-sm border border-white/15 hover:bg-white/5 rounded-xl font-medium transition-colors">
+              RESET TO STARSHIP IFT-2
+            </button>
+            <button onclick="captureFrame()" 
+                    class="flex-1 py-2.5 text-sm bg-white/10 hover:bg-white/15 rounded-xl font-medium transition-colors">
+              CAPTURE FRAME
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live metrics -->
+    <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div class="lab-card rounded-2xl px-6 py-4">
+        <div class="text-xs text-zinc-500">FIRST DIAMOND DISTANCE</div>
+        <div class="text-3xl font-semibold tabular-nums mt-1" id="first-diamond">—</div>
+        <div class="text-orange-400 text-xs font-mono">METERS (THEORETICAL)</div>
+      </div>
+      <div class="lab-card rounded-2xl px-6 py-4">
+        <div class="text-xs text-zinc-500">VISIBLE DIAMONDS</div>
+        <div class="text-3xl font-semibold tabular-nums mt-1" id="visible-diamonds">—</div>
+        <div class="text-cyan-400 text-xs font-mono">BEFORE DISSIPATION</div>
+      </div>
+      <div class="lab-card rounded-2xl px-6 py-4">
+        <div class="text-xs text-zinc-500">POST-SHOCK ΔT</div>
+        <div class="text-3xl font-semibold tabular-nums mt-1" id="temp-jump">—</div>
+        <div class="text-amber-400 text-xs font-mono">K (NORMAL SHOCK)</div>
+      </div>
+      <div class="lab-card rounded-2xl px-6 py-4">
+        <div class="text-xs text-zinc-500">PRESSURE RATIO</div>
+        <div class="text-3xl font-semibold tabular-nums mt-1" id="pressure-ratio">—</div>
+        <div class="text-zinc-400 text-xs font-mono">P₀ / Pₐ</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Starship Specifics + Gallery -->
+  <section id="gallery" class="max-w-6xl mx-auto px-8 pb-20">
+    <div class="mb-8">
+      <div class="uppercase text-cyan-400 text-xs tracking-widest font-semibold">STARSHIP SPECIFICS</div>
+      <h4 class="display-font text-3xl tracking-tight mt-1">Why the 33-engine cluster created something unprecedented.</h4>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="lab-card rounded-3xl p-8">
+        <img src="assets/single-raptor-labeled.jpg" alt="Labeled diagram of shock diamonds in a single Raptor engine exhaust" 
+             class="rounded-xl w-full border border-white/10">
+        <div class="mt-5 text-xs text-zinc-400">
+          Single Raptor sea-level nozzle produces classic, tightly spaced diamonds. The physics are the same as fighter jet afterburners — just scaled up dramatically.
+        </div>
+      </div>
+      
+      <div class="space-y-6 text-[15px] text-zinc-300">
+        <p>The Super Heavy booster’s 33 Raptor engines fire together, creating an effective “mega-nozzle” whose combined exhaust diameter and mass flow dwarf any previous vehicle. The result is the largest, most clearly defined shock diamond structure ever captured on a launch.</p>
+        
+        <div class="bg-white/5 border border-white/10 p-5 rounded-2xl text-sm">
+          <div class="font-medium text-white mb-2">Key contributing factors:</div>
+          <ul class="space-y-2 text-zinc-400">
+            <li>• Extremely high chamber pressure</li>
+            <li>• Sea-level optimized nozzles at high ambient pressure</li>
+            <li>• Massive effective exit diameter from clustered engines</li>
+            <li>• Dense, luminous afterburning in the Mach disks</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visual Gallery -->
+  <section class="max-w-6xl mx-auto px-8 pb-20">
+    <div class="mb-6">
+      <div class="uppercase text-cyan-400 text-xs tracking-[3px] font-semibold">VISUAL GALLERY</div>
+      <h4 class="display-font text-3xl tracking-tight mt-1">Custom renders generated for this lab</h4>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Image 1 -->
+      <div class="lab-card rounded-2xl overflow-hidden">
+        <img src="assets/cluster-mega-diamond.jpg" alt="Comparison of single Raptor shock diamonds vs the massive 33-engine Starship cluster mega diamonds" class="w-full h-auto">
+        <div class="p-5 text-sm">
+          <div class="font-medium text-orange-400">33-Engine Mega Diamonds</div>
+          <div class="text-zinc-400 mt-1 text-[13px]">The clustered exhaust creates an effective “mega-nozzle” producing the largest, most clearly defined shock structures ever seen on a launch vehicle.</div>
+        </div>
+      </div>
+
+      <!-- Image 2 -->
+      <div class="lab-card rounded-2xl overflow-hidden">
+        <img src="assets/shock-cell-schematic.jpg" alt="Physics schematic showing oblique shocks, expansion fans, and Mach disks forming the repeating diamond pattern" class="w-full h-auto">
+        <div class="p-5 text-sm">
+          <div class="font-medium text-orange-400">Wave Pattern Schematic</div>
+          <div class="text-zinc-400 mt-1 text-[13px]">Oblique shocks compress the flow while expansion fans re-accelerate it. The normal shock (Mach disk) creates the bright visible glow through afterburning.</div>
+        </div>
+      </div>
+
+      <!-- Image 3 -->
+      <div class="lab-card rounded-2xl overflow-hidden">
+        <img src="assets/altitude-variation.jpg" alt="Comparison of shock diamond behavior at sea level versus high altitude" class="w-full h-auto">
+        <div class="p-5 text-sm">
+          <div class="font-medium text-orange-400">Altitude Effect</div>
+          <div class="text-zinc-400 mt-1 text-[13px]">At sea level the plume is strongly overexpanded (many bright diamonds). At altitude the ambient pressure drops and the pattern changes dramatically or disappears.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3 text-[12px] text-zinc-500 font-mono tracking-wide">All images generated specifically for this project using Grok Imagine</div>
+  </section>
+
+  <footer class="border-t border-white/10 py-9 text-xs text-center text-zinc-500 font-mono tracking-widest">
+    GROKCLI SHOCKWAVE LAB — BUILT LIVE WITH GROK 4.3, GROK IMAGINE, AND GITHUB MCP<br>
+    <span class="text-[10px]">Physics model is an educational approximation. Real rocket plumes involve 3D turbulent reacting flow.</span>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

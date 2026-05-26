@@ -1,0 +1,17 @@
+# Ignore captured frames from the simulator
+*.png
+shockwave-lab-*.png
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.log
+
+# Future build artifacts (if we ever add a build step)
+dist/
+node_modules/
+build/
